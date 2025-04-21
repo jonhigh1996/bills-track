@@ -11,6 +11,7 @@ const BillForm: React.FC<BillFormProps> = ({ onAddBill }) => {
   const [name, setName] = useState('');
   const [amount, setAmount] = useState('');
   const [dueDate, setDueDate] = useState('');
+  const [paymentMethod, setPaymentMethod] = useState('');
   const [errors, setErrors] = useState<Record<string, string>>({});
   const formRef = useRef<HTMLFormElement>(null);
 
@@ -29,6 +30,10 @@ const BillForm: React.FC<BillFormProps> = ({ onAddBill }) => {
       if (isNaN(numericAmount) || numericAmount <= 0) {
         newErrors.amount = 'Amount must be a positive number';
       }
+    }
+    
+    if (!paymentMethod) {
+      newErrors.paymentMethod = 'Payment method is required';
     }
     
     if (!dueDate) {
@@ -77,6 +82,7 @@ const BillForm: React.FC<BillFormProps> = ({ onAddBill }) => {
         name: name.trim(),
         amount: Number(amount.replace(/[^0-9.-]+/g, '')),
         dueDate: isoDate,
+        paymentMethod: paymentMethod,
       };
       
       onAddBill(newBill);
@@ -85,13 +91,14 @@ const BillForm: React.FC<BillFormProps> = ({ onAddBill }) => {
       setName('');
       setAmount('');
       setDueDate('');
+      setPaymentMethod('');
       setErrors({});
     }
   };
 
   return (
-    <div className="bg-white p-6 rounded-lg shadow-md">
-      <h2 className="text-xl font-semibold mb-4">Add New Bill</h2>
+    <div className="bg-white p-4 sm:p-6 rounded-lg shadow-md w-full max-w-lg mx-auto">
+      <h2 className="text-lg sm:text-xl font-semibold mb-4 text-center sm:text-left">Add New Bill</h2>
       <form ref={formRef} onSubmit={handleSubmit} aria-label="Bill entry form">
         <div className="mb-4">
           <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
@@ -114,7 +121,7 @@ const BillForm: React.FC<BillFormProps> = ({ onAddBill }) => {
           <label htmlFor="amount" className="block text-sm font-medium text-gray-700 mb-1">
             Amount
           </label>
-          <div className="relative">
+          <div className="relative flex items-center">
             <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">$</span>
             <input
               type="text"
@@ -183,6 +190,25 @@ const BillForm: React.FC<BillFormProps> = ({ onAddBill }) => {
             aria-describedby={errors.dueDate ? 'date-error' : undefined}
           />
           {errors.dueDate && <p id="date-error" className="mt-1 text-sm text-red-500">{errors.dueDate}</p>}
+        </div>
+        
+        <div className="mb-4">
+          <label htmlFor="paymentMethod" className="block text-sm font-medium text-gray-700 mb-1">
+            Ways to Pay (How & Where)
+          </label>
+          <input
+            type="text"
+            id="paymentMethod"
+            value={paymentMethod}
+            onChange={(e) => setPaymentMethod(e.target.value)}
+            className={`w-full px-3 py-2 border rounded-md ${
+              errors.paymentMethod ? 'border-red-500' : 'border-gray-300'
+            }`}
+            placeholder="e.g., Pay online at website.com, Call 555-1234, Mail check to P.O. Box 123"
+            aria-describedby={errors.paymentMethod ? 'payment-error' : undefined}
+          />
+
+          {errors.paymentMethod && <p id="payment-error" className="mt-1 text-sm text-red-500">{errors.paymentMethod}</p>}
         </div>
         
         <button

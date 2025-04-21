@@ -3,6 +3,7 @@ import Head from 'next/head';
 import BillForm from '@/components/BillForm';
 import Calendar from '@/components/Calendar';
 import UpcomingBillsBox from '@/components/UpcomingBillsBox';
+import PastDueBillsBox from '@/components/PastDueBillsBox';
 import { Bill } from '@/types';
 import { getBills, addBill, deleteBill } from '@/utils/storageService';
 
@@ -39,28 +40,39 @@ export default function Home() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <main className="container mx-auto px-4 py-8">
-        <h1 className="text-3xl font-bold text-center mb-8">
-          Simple Bill Tracker
-        </h1>
+      <div className="container mx-auto px-4 py-4 sm:py-8 max-w-7xl">
+        <h1 className="text-2xl sm:text-3xl font-bold mb-4 sm:mb-8 text-center">Simple Bill Tracker</h1>
         
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <div className="lg:col-span-1">
-            <div className="space-y-6">
-              <BillForm onAddBill={handleAddBill} />
-              <UpcomingBillsBox 
-                bills={bills} 
-                onDeleteBill={handleDeleteBill} 
-                onMarkPaid={handleMarkPaid}
-              />
-            </div>
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-6 lg:gap-8">
+          <div className="lg:col-span-4">
+            <BillForm onAddBill={handleAddBill} />
           </div>
           
-          <div className="lg:col-span-2">
-            <Calendar bills={bills} />
+          <div className="lg:col-span-8">
+            <div className="space-y-4 sm:space-y-6">
+              <div className="bg-white p-4 sm:p-6 rounded-lg shadow-md">
+                <PastDueBillsBox
+                  bills={bills}
+                  onDeleteBill={handleDeleteBill}
+                />
+                <UpcomingBillsBox 
+                  bills={bills} 
+                  onDeleteBill={handleDeleteBill} 
+                  onMarkPaid={handleMarkPaid}
+                />
+              </div>
+              
+              <div className="bg-white p-4 sm:p-6 rounded-lg shadow-md overflow-x-auto">
+                <Calendar 
+                  bills={bills} 
+                  onDeleteBill={handleDeleteBill} 
+                  onMarkPaid={handleMarkPaid}
+                />
+              </div>
+            </div>
           </div>
         </div>
-      </main>
+      </div>
 
       <footer className="py-6 text-center text-gray-500 text-sm">
         <p>

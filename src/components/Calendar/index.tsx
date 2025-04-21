@@ -5,9 +5,11 @@ import { getDaysInMonth, getFirstDayOfMonth } from '@/utils/dateHelpers';
 
 interface CalendarProps {
   bills: Bill[];
+  onDeleteBill?: (id: string) => void;
+  onMarkPaid?: (id: string) => void;
 }
 
-const Calendar: React.FC<CalendarProps> = ({ bills }) => {
+const Calendar: React.FC<CalendarProps> = ({ bills, onDeleteBill, onMarkPaid }) => {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [calendarDays, setCalendarDays] = useState<Array<{ day: number; month: number; year: number; isCurrentMonth: boolean }>>([]);
   
@@ -151,6 +153,8 @@ const Calendar: React.FC<CalendarProps> = ({ bills }) => {
             year={dayData.year}
             bills={bills}
             isCurrentMonth={dayData.isCurrentMonth}
+            onDeleteBill={onDeleteBill}
+            onMarkPaid={onMarkPaid}
           />
         ))}
       </div>

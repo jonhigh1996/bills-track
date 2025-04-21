@@ -5,7 +5,7 @@ import { getDueInDays, formatCurrency } from '@/utils/dateHelpers';
 interface UpcomingBillsBoxProps {
   bills: Bill[];
   onDeleteBill: (id: string) => void;
-  onMarkPaid: (id: string) => void;
+  onMarkPaid: (id: string) => void; // Keeping for interface compatibility, but we won't use it
 }
 
 const UpcomingBillsBox: React.FC<UpcomingBillsBoxProps> = ({ bills, onDeleteBill, onMarkPaid }) => {
@@ -13,14 +13,17 @@ const UpcomingBillsBox: React.FC<UpcomingBillsBoxProps> = ({ bills, onDeleteBill
   const upcomingBills = useMemo(() => {
     return bills
       .filter(bill => {
-        const daysUntilDue = getDueInDays(bill.dueDate);
-        return daysUntilDue >= 0 && daysUntilDue <= 7;
+        const dueDate = new Date(bill.dueDate);
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        const sevenDaysFromNow = new Date(today);
+        sevenDaysFromNow.setDate(today.getDate() + 7);
+        
+        // Only include bills that are due today or in the future (not past due)
+        // and within the next 7 days
+        return dueDate >= today && dueDate <= sevenDaysFromNow;
       })
-      .sort((a, b) => {
-        const daysA = getDueInDays(a.dueDate);
-        const daysB = getDueInDays(b.dueDate);
-        return daysA - daysB;
-      });
+      .sort((a, b) => new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime());
   }, [bills]);
 
   if (upcomingBills.length === 0) {
@@ -63,52 +66,41 @@ const UpcomingBillsBox: React.FC<UpcomingBillsBoxProps> = ({ bills, onDeleteBill
           return (
             <div 
               key={bill.id} 
-              className="flex items-center justify-between p-3 border rounded-md hover:bg-gray-50 transition duration-200"
+              className="flex items-center justify-between p-4 border rounded-md hover:bg-gray-50 transition duration-200 mb-2 shadow-sm"
             >
-              <div>
-                <div className="font-medium">{bill.name}</div>
-                <div className="text-gray-600">{formatCurrency(bill.amount)}</div>
-                <div className="text-sm text-gray-500">
-                  Due: {new Date(bill.dueDate).toLocaleDateString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric' })}
+              <div className="flex-grow mr-4">
+                <div className="flex justify-between items-center">
+                  <span className="font-medium text-lg">{bill.name}</span>
+                  <span className="font-semibold text-blue-600">
+                    ${bill.amount.toLocaleString('en-US', { maximumFractionDigits: 0 })}
+                  </span>
+                </div>
+                
+                <div className="text-sm text-gray-600 mt-1">
+                  Due {new Date(bill.dueDate).toLocaleDateString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric' })}
+                  <span className="ml-2 px-2 py-0.5 bg-blue-100 text-blue-800 rounded-full text-xs font-medium">
+                    {daysUntilDue === 0 ? 'Due today' : daysUntilDue === 1 ? 'Due tomorrow' : `${daysUntilDue} days`}
+                  </span>
+                </div>
+                
+                <div className="text-xs text-gray-600 mt-2 border-t border-gray-100 pt-2">
+                  <span className="font-medium">Payment Instructions:</span> {bill.paymentMethod || 'Not specified'}
                 </div>
               </div>
               
-              <div className="flex items-center space-x-2">
-                <span className={`px-2 py-1 rounded-full text-xs font-medium ${statusColor}`}>
-                  {daysUntilDue === 0 
-                    ? 'Due today' 
-                    : daysUntilDue === 1 
-                      ? 'Due tomorrow' 
-                      : `Due in ${daysUntilDue} days`}
-                </span>
-                
-                <div className="flex space-x-1">
-                  {onMarkPaid && (
-                    <button 
-                      onClick={() => onMarkPaid(bill.id)}
-                      className="p-1 text-gray-400 hover:text-green-500 transition duration-200"
-                      aria-label="Mark bill as paid"
-                      title="Mark as paid"
-                    >
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                      </svg>
-                    </button>
-                  )}
-                  
-                  {onDeleteBill && (
-                    <button 
-                      onClick={() => onDeleteBill(bill.id)}
-                      className="p-1 text-gray-400 hover:text-red-500 transition duration-200"
-                      aria-label="Delete bill"
-                      title="Delete bill"
-                    >
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                        <path fillRule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clipRule="evenodd" />
-                      </svg>
-                    </button>
-                  )}
-                </div>
+              <div>
+                {onDeleteBill && (
+                  <button 
+                    onClick={() => onDeleteBill(bill.id)}
+                    className="p-2 text-gray-400 hover:text-red-500 transition duration-200 rounded-md hover:bg-gray-100"
+                    aria-label="Delete bill"
+                    title="Delete bill"
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                      <path fillRule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clipRule="evenodd" />
+                    </svg>
+                  </button>
+                )}
               </div>
             </div>
           );

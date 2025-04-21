@@ -3,4 +3,5 @@ export interface Bill {
   name: string;
   amount: number;
   dueDate: string; // ISO Date format (YYYY-MM-DD)
+  paymentMethod: string; // Ways to pay
 }
