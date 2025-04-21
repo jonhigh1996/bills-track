@@ -1,4 +1,22 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Simple Bill Tracker
+
+A lightweight web app that allows users to manually input their bills and visualize them on a calendar according to the due date. It focuses on minimalism and simplicity for fast entry and easy viewing.
+
+## Features
+
+- Manual entry of bill data: name, amount, and due date
+- Visual calendar display of bills by due date
+- Upcoming bills section showing bills due in 7 days or less
+- Responsive design for mobile and desktop
+- Client-side state management with localStorage
+
+## Tech Stack
+
+- **Framework**: Next.js (Pages Router)
+- **Language**: TypeScript
+- **Styling**: Tailwind CSS
+- **State Management**: React useState + localStorage
+- **Deployment**: Vercel-ready
 
 ## Getting Started
 
@@ -6,31 +24,52 @@ First, run the development server:
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000) with your browser to see the app.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Project Structure
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```
+/src
+  /components
+    /BillForm        # Form for adding new bills
+    /Calendar        # Monthly calendar view
+    /DayCell         # Individual day cell in calendar
+    /UpcomingBillsBox # Display of upcoming bills
+  /pages
+    index.tsx       # Main page layout
+    _app.tsx        # Next.js app wrapper
+  /styles
+    globals.css     # Global styles
+  /types
+    index.ts        # TypeScript interfaces
+  /utils
+    dateHelpers.ts  # Date utility functions
+    storageService.ts # localStorage handling
+```
 
-## Learn More
+## Design Principles
 
-To learn more about Next.js, take a look at the following resources:
+- **SOLID**: Each component has a single responsibility
+- **DRY**: Common functionality extracted to utility functions
+- **Law of Demeter**: Components only know about their immediate dependencies
+- **Componentization over Inheritance**: Using functional components with composition
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Deployment
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+This project is ready for deployment on Vercel:
 
-## Deploy on Vercel
+1. Push the code to a GitHub repository
+2. Connect the repository to Vercel
+3. Deploy with default settings
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+No additional configuration is required as all state is managed client-side.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Future Enhancements
+
+- Backend integration with Supabase or Firebase
+- Monthly/weekly view toggle
+- Notifications/reminders
+- Bill recurrence settings
+- Export as CSV or JSON

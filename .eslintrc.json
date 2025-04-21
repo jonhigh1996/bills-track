@@ -1,0 +1,41 @@
+{
+  "extends": [
+    "next/core-web-vitals",
+    "eslint:recommended",
+    "plugin:@typescript-eslint/recommended"
+  ],
+  "plugins": [
+    "@typescript-eslint",
+    "react-hooks"
+  ],
+  "rules": {
+    // Enforce SOLID principles
+    "max-classes-per-file": ["error", 1],
+    "no-param-reassign": "error",
+    
+    // Enforce DRY principle
+    "no-duplicate-imports": "error",
+    
+    // Enforce Law of Demeter (limit chain of method calls)
+    "no-restricted-syntax": [
+      "error",
+      {
+        "selector": "MemberExpression[object.type='MemberExpression'][object.object.type='MemberExpression']",
+        "message": "Property chain is too long. Consider restructuring to follow Law of Demeter."
+      }
+    ],
+    
+    // Enforce componentization
+    "react/prefer-stateless-function": "warn",
+    
+    // Enforce hook rules
+    "react-hooks/rules-of-hooks": "error",
+    "react-hooks/exhaustive-deps": "warn",
+    
+    // General best practices
+    "no-console": ["warn", { "allow": ["warn", "error"] }],
+    "@typescript-eslint/explicit-module-boundary-types": "off",
+    "@typescript-eslint/no-explicit-any": "error",
+    "@typescript-eslint/no-unused-vars": ["error", { "argsIgnorePattern": "^_" }]
+  }
+}
