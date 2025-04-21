@@ -1,7 +1,7 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import DayCell from '@/components/DayCell';
+import React, { useState, useEffect } from 'react';
+import DayCell from '../DayCell';
 import { Bill } from '@/types';
-import { getDaysInMonth, getFirstDayOfMonth, formatDate } from '@/utils/dateHelpers';
+import { getDaysInMonth, getFirstDayOfMonth } from '@/utils/dateHelpers';
 
 interface CalendarProps {
   bills: Bill[];
@@ -17,9 +17,8 @@ const Calendar: React.FC<CalendarProps> = ({ bills }) => {
     'July', 'August', 'September', 'October', 'November', 'December'
   ];
 
-  useEffect(() => {
-    generateCalendarDays();
-  }, [currentDate]);
+  const currentMonth = currentDate.getMonth();
+  const currentYear = currentDate.getFullYear();
 
   const generateCalendarDays = () => {
     const year = currentDate.getFullYear();
@@ -68,8 +67,12 @@ const Calendar: React.FC<CalendarProps> = ({ bills }) => {
       });
     }
     
-    setCalendarDays(days);
+    return days;
   };
+
+  useEffect(() => {
+    setCalendarDays(generateCalendarDays());
+  }, [currentMonth, currentYear]);
 
   const goToPreviousMonth = () => {
     setCurrentDate(prev => {

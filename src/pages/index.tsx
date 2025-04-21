@@ -1,10 +1,10 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import Head from 'next/head';
 import BillForm from '@/components/BillForm';
 import Calendar from '@/components/Calendar';
 import UpcomingBillsBox from '@/components/UpcomingBillsBox';
 import { Bill } from '@/types';
-import { getBills, addBill, deleteBill, saveBills } from '@/utils/storageService';
+import { getBills, addBill, deleteBill } from '@/utils/storageService';
 
 export default function Home() {
   const [bills, setBills] = useState<Bill[]>([]);

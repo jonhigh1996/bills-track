@@ -1,7 +1,7 @@
 import { useState, FormEvent, useRef } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import { Bill } from '@/types';
-import { formatCurrency } from '@/utils/dateHelpers';
+import { formatDate } from '@/utils/dateHelpers';
 
 interface BillFormProps {
   onAddBill: (bill: Bill) => void;
@@ -66,7 +66,11 @@ const BillForm: React.FC<BillFormProps> = ({ onAddBill }) => {
     if (validateForm()) {
       // Convert MM/DD/YYYY to ISO format for storage
       const parts = dueDate.split('/');
-      const isoDate = `${parts[2]}-${parts[0]}-${parts[1]}`;
+      const month = parts[0].padStart(2, '0');
+      const day = parts[1].padStart(2, '0');
+      const year = parts[2];
+      const dateObj = new Date(`${year}-${month}-${day}`);
+      const isoDate = formatDate(dateObj);
       
       const newBill: Bill = {
         id: uuidv4(),
