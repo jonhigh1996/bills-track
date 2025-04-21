@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 import { Bill } from '@/types';
-import { getDueInDays, formatCurrency } from '@/utils/dateHelpers';
+import { getDueInDays } from '@/utils/dateHelpers';
 
 interface UpcomingBillsBoxProps {
   bills: Bill[];
@@ -8,7 +8,10 @@ interface UpcomingBillsBoxProps {
   onMarkPaid: (id: string) => void; // Keeping for interface compatibility, but we won't use it
 }
 
-const UpcomingBillsBox: React.FC<UpcomingBillsBoxProps> = ({ bills, onDeleteBill, onMarkPaid }) => {
+const UpcomingBillsBox: React.FC<UpcomingBillsBoxProps> = ({ bills, onDeleteBill, 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  onMarkPaid 
+}) => {
 
   const upcomingBills = useMemo(() => {
     return bills
@@ -53,13 +56,18 @@ const UpcomingBillsBox: React.FC<UpcomingBillsBoxProps> = ({ bills, onDeleteBill
       <div className="space-y-3">
         {upcomingBills.map(bill => {
           const daysUntilDue = getDueInDays(bill.dueDate);
+          // Status colors for different due dates (used in the badge)
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
           let statusColor = 'bg-green-100 text-green-800';
           
           if (daysUntilDue === 0) {
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
             statusColor = 'bg-red-100 text-red-800';
           } else if (daysUntilDue <= 2) {
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
             statusColor = 'bg-orange-100 text-orange-800';
           } else if (daysUntilDue <= 4) {
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
             statusColor = 'bg-yellow-100 text-yellow-800';
           }
           

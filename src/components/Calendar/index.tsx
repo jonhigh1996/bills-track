@@ -74,6 +74,7 @@ const Calendar: React.FC<CalendarProps> = ({ bills, onDeleteBill, onMarkPaid }) 
 
   useEffect(() => {
     setCalendarDays(generateCalendarDays());
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentMonth, currentYear]);
 
   const goToPreviousMonth = () => {

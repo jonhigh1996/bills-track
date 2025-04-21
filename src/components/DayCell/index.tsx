@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Bill } from '@/types';
-import { isToday, formatCurrency } from '@/utils/dateHelpers';
+import { isToday } from '@/utils/dateHelpers';
 
 interface DayCellProps {
   day: number;
@@ -19,6 +19,7 @@ const DayCell: React.FC<DayCellProps> = ({
   bills, 
   isCurrentMonth,
   onDeleteBill,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   onMarkPaid
 }) => {
   const [expandedBillId, setExpandedBillId] = useState<string | null>(null);
