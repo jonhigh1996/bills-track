@@ -4,15 +4,19 @@ import BillForm from '@/components/BillForm';
 import Calendar from '@/components/Calendar';
 import UpcomingBillsBox from '@/components/UpcomingBillsBox';
 import PastDueBillsBox from '@/components/PastDueBillsBox';
+import ExportImport from '@/components/ExportImport';
 import { Bill } from '@/types';
 import { getBills, addBill, deleteBill } from '@/utils/storageService';
 
 export default function Home() {
   const [bills, setBills] = useState<Bill[]>([]);
 
-  useEffect(() => {
-    // Load bills from localStorage on initial render
+  const loadBills = () => {
     setBills(getBills());
+  };
+
+  useEffect(() => {
+    loadBills();
   }, []);
 
   const handleAddBill = (bill: Bill) => {
@@ -72,6 +76,10 @@ export default function Home() {
             </div>
           </div>
         </div>
+      </div>
+
+      <div className="container mx-auto px-4 py-4 sm:py-8 max-w-7xl">
+        <ExportImport onImportComplete={loadBills} />
       </div>
 
       <footer className="py-6 text-center text-gray-500 text-sm">
