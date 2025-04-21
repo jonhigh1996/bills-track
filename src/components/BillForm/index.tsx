@@ -1,6 +1,6 @@
 import { useState, FormEvent, useRef } from 'react';
 import { v4 as uuidv4 } from 'uuid';
-import { Bill } from '@/types';
+import { Bill, RecurringFrequency } from '@/types';
 import { formatDate } from '@/utils/dateHelpers';
 
 interface BillFormProps {
@@ -12,6 +12,9 @@ const BillForm: React.FC<BillFormProps> = ({ onAddBill }) => {
   const [amount, setAmount] = useState('');
   const [dueDate, setDueDate] = useState('');
   const [paymentMethod, setPaymentMethod] = useState('');
+  const [isRecurring, setIsRecurring] = useState(false);
+  const [recurringFrequency, setRecurringFrequency] = useState<RecurringFrequency>('monthly');
+  const [recurringEndDate, setRecurringEndDate] = useState('');
   const [errors, setErrors] = useState<Record<string, string>>({});
   const formRef = useRef<HTMLFormElement>(null);
 
@@ -61,6 +64,41 @@ const BillForm: React.FC<BillFormProps> = ({ onAddBill }) => {
       }
     }
     
+    // Validate recurring end date if provided
+    if (isRecurring && recurringEndDate) {
+      const dateRegex = /^(0[1-9]|1[0-2])\/(0[1-9]|[12]\d|3[01])\/(19|20)\d{2}$/;
+      if (!dateRegex.test(recurringEndDate)) {
+        newErrors.recurringEndDate = 'Date must be in MM/DD/YYYY format';
+      } else {
+        // Check if it's a valid date
+        const parts = recurringEndDate.split('/');
+        const month = parseInt(parts[0], 10) - 1;
+        const day = parseInt(parts[1], 10);
+        const year = parseInt(parts[2], 10);
+        const dateObj = new Date(year, month, day);
+        
+        if (
+          dateObj.getFullYear() !== year ||
+          dateObj.getMonth() !== month ||
+          dateObj.getDate() !== day
+        ) {
+          newErrors.recurringEndDate = 'Please enter a valid date';
+        }
+        
+        // Check if end date is after due date
+        const dueDateParts = dueDate.split('/');
+        const dueDateObj = new Date(
+          parseInt(dueDateParts[2], 10),
+          parseInt(dueDateParts[0], 10) - 1,
+          parseInt(dueDateParts[1], 10)
+        );
+        
+        if (dateObj <= dueDateObj) {
+          newErrors.recurringEndDate = 'End date must be after the first due date';
+        }
+      }
+    }
+    
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -77,12 +115,26 @@ const BillForm: React.FC<BillFormProps> = ({ onAddBill }) => {
       const dateObj = new Date(`${year}-${month}-${day}`);
       const isoDate = formatDate(dateObj);
       
+      // Process recurring end date if provided
+      let isoEndDate: string | undefined;
+      if (isRecurring && recurringEndDate) {
+        const endParts = recurringEndDate.split('/');
+        const endMonth = endParts[0].padStart(2, '0');
+        const endDay = endParts[1].padStart(2, '0');
+        const endYear = endParts[2];
+        const endDateObj = new Date(`${endYear}-${endMonth}-${endDay}`);
+        isoEndDate = formatDate(endDateObj);
+      }
+      
       const newBill: Bill = {
         id: uuidv4(),
         name: name.trim(),
         amount: Number(amount.replace(/[^0-9.-]+/g, '')),
         dueDate: isoDate,
         paymentMethod: paymentMethod,
+        isRecurring: isRecurring,
+        ...(isRecurring && { recurringFrequency }),
+        ...(isoEndDate && { recurringEndDate: isoEndDate }),
       };
       
       onAddBill(newBill);
@@ -92,6 +144,9 @@ const BillForm: React.FC<BillFormProps> = ({ onAddBill }) => {
       setAmount('');
       setDueDate('');
       setPaymentMethod('');
+      setIsRecurring(false);
+      setRecurringFrequency('monthly');
+      setRecurringEndDate('');
       setErrors({});
     }
   };
@@ -209,6 +264,91 @@ const BillForm: React.FC<BillFormProps> = ({ onAddBill }) => {
           />
 
           {errors.paymentMethod && <p id="payment-error" className="mt-1 text-sm text-red-500">{errors.paymentMethod}</p>}
+        </div>
+        
+        {/* Recurring Bill Options */}
+        <div className="mb-4">
+          <div className="flex items-center mb-2">
+            <input
+              type="checkbox"
+              id="isRecurring"
+              checked={isRecurring}
+              onChange={(e) => setIsRecurring(e.target.checked)}
+              className="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+            />
+            <label htmlFor="isRecurring" className="ml-2 block text-sm font-medium text-gray-700">
+              This is a recurring bill
+            </label>
+          </div>
+          
+          {isRecurring && (
+            <div className="pl-6 border-l-2 border-blue-100 mt-3 space-y-3">
+              <div>
+                <label htmlFor="recurringFrequency" className="block text-sm font-medium text-gray-700 mb-1">
+                  How often does this bill recur?
+                </label>
+                <select
+                  id="recurringFrequency"
+                  value={recurringFrequency}
+                  onChange={(e) => setRecurringFrequency(e.target.value as RecurringFrequency)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                >
+                  <option value="weekly">Weekly</option>
+                  <option value="biweekly">Every Two Weeks</option>
+                  <option value="monthly">Monthly</option>
+                  <option value="quarterly">Quarterly (Every 3 Months)</option>
+                  <option value="annually">Annually (Yearly)</option>
+                </select>
+              </div>
+              
+              <div>
+                <label htmlFor="recurringEndDate" className="block text-sm font-medium text-gray-700 mb-1">
+                  End Date (Optional, MM/DD/YYYY)
+                </label>
+                <input
+                  type="text"
+                  id="recurringEndDate"
+                  value={recurringEndDate}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    // Allow typing but enforce format
+                    if (value === '' || /^\d{0,2}(\/\d{0,2}(\/\d{0,4})?)?$/.test(value)) {
+                      setRecurringEndDate(value);
+                    }
+                  }}
+                  onBlur={() => {
+                    // Validate and convert to ISO format on blur
+                    if (recurringEndDate) {
+                      const parts = recurringEndDate.split('/');
+                      if (parts.length === 3) {
+                        const month = parts[0].padStart(2, '0');
+                        const day = parts[1].padStart(2, '0');
+                        const year = parts[2].length === 2 ? `20${parts[2]}` : parts[2];
+                        
+                        // Check if it's a valid date
+                        const dateObj = new Date(`${year}-${month}-${day}`);
+                        if (!isNaN(dateObj.getTime())) {
+                          // Convert to ISO format
+                          setRecurringEndDate(`${month}/${day}/${year}`);
+                        }
+                      }
+                    }
+                  }}
+                  placeholder="MM/DD/YYYY (Leave blank for no end date)"
+                  className={`w-full px-3 py-2 border rounded-md ${
+                    errors.recurringEndDate ? 'border-red-500' : 'border-gray-300'
+                  }`}
+                  aria-describedby={errors.recurringEndDate ? 'end-date-error' : undefined}
+                />
+                {errors.recurringEndDate && (
+                  <p id="end-date-error" className="mt-1 text-sm text-red-500">{errors.recurringEndDate}</p>
+                )}
+                <p className="mt-1 text-xs text-gray-500">
+                  Leave blank if this bill recurs indefinitely
+                </p>
+              </div>
+            </div>
+          )}
         </div>
         
         <button

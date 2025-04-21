@@ -7,9 +7,10 @@ interface CalendarProps {
   bills: Bill[];
   onDeleteBill?: (id: string) => void;
   onMarkPaid?: (id: string) => void;
+  onMonthChange?: (date: Date) => void;
 }
 
-const Calendar: React.FC<CalendarProps> = ({ bills, onDeleteBill, onMarkPaid }) => {
+const Calendar: React.FC<CalendarProps> = ({ bills, onDeleteBill, onMarkPaid, onMonthChange }) => {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [calendarDays, setCalendarDays] = useState<Array<{ day: number; month: number; year: number; isCurrentMonth: boolean }>>([]);
   
@@ -74,6 +75,7 @@ const Calendar: React.FC<CalendarProps> = ({ bills, onDeleteBill, onMarkPaid }) 
 
   useEffect(() => {
     setCalendarDays(generateCalendarDays());
+    if (onMonthChange) onMonthChange(currentDate);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentMonth, currentYear]);
 
@@ -81,6 +83,7 @@ const Calendar: React.FC<CalendarProps> = ({ bills, onDeleteBill, onMarkPaid }) 
     setCurrentDate(prev => {
       const newDate = new Date(prev);
       newDate.setMonth(prev.getMonth() - 1);
+      if (onMonthChange) onMonthChange(newDate);
       return newDate;
     });
   };
@@ -89,12 +92,15 @@ const Calendar: React.FC<CalendarProps> = ({ bills, onDeleteBill, onMarkPaid }) 
     setCurrentDate(prev => {
       const newDate = new Date(prev);
       newDate.setMonth(prev.getMonth() + 1);
+      if (onMonthChange) onMonthChange(newDate);
       return newDate;
     });
   };
 
   const goToCurrentMonth = () => {
-    setCurrentDate(new Date());
+    const newDate = new Date();
+    setCurrentDate(newDate);
+    if (onMonthChange) onMonthChange(newDate);
   };
 
   return (

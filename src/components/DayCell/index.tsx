@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Bill } from '@/types';
 import { isToday } from '@/utils/dateHelpers';
+import { formatRecurringFrequency } from '@/utils/recurringBillsHelper';
 
 interface DayCellProps {
   day: number;
@@ -69,10 +70,18 @@ const DayCell: React.FC<DayCellProps> = ({
         {dayBills.map(bill => (
           <div 
             key={bill.id} 
-            className="text-xs mb-1 sm:mb-2 p-1 sm:p-2 rounded-md bg-blue-50 border-l-4 border-blue-500 shadow-sm"
+            className={`text-xs mb-1 sm:mb-2 p-1 sm:p-2 rounded-md ${bill.isRecurring ? 'bg-green-50 border-l-4 border-green-500' : 'bg-blue-50 border-l-4 border-blue-500'} shadow-sm`}
           >
             <div className="flex justify-between items-center cursor-pointer" onClick={() => toggleBillDetails(bill.id)}>
-              <div className="text-sm font-medium truncate">{bill.name}</div>
+              <div className="text-sm font-medium truncate flex items-center">
+                {bill.name}
+                {bill.isRecurring && (
+                  <span 
+                    className="ml-1 inline-block w-2 h-2 rounded-full bg-green-500"
+                    title={`Recurring ${formatRecurringFrequency(bill.recurringFrequency)}`}
+                  ></span>
+                )}
+              </div>
               <button 
                 className="text-gray-500 hover:text-gray-700 focus:outline-none flex items-center justify-center bg-white rounded-full p-1 border border-gray-200 shadow-sm"
                 aria-label={expandedBillId === bill.id ? "Hide details" : "Show details"}
@@ -88,11 +97,21 @@ const DayCell: React.FC<DayCellProps> = ({
                 )}
               </button>
             </div>
-            <div className="text-sm font-semibold text-blue-600 mt-1">
+            <div className={`text-sm font-semibold ${bill.isRecurring ? 'text-green-600' : 'text-blue-600'} mt-1`}>
               ${bill.amount.toLocaleString('en-US', { maximumFractionDigits: 0 })}
             </div>
             {expandedBillId === bill.id && (
-              <div className="mt-2 pt-2 border-t border-blue-200 text-xs text-gray-600 animate-fadeIn">
+              <div className={`mt-2 pt-2 border-t ${bill.isRecurring ? 'border-green-200' : 'border-blue-200'} text-xs text-gray-600 animate-fadeIn`}>
+                {bill.isRecurring && (
+                  <div className="mb-2">
+                    <span className="font-medium">Recurring:</span> {formatRecurringFrequency(bill.recurringFrequency)}
+                    {bill.recurringEndDate && (
+                      <div>
+                        <span className="font-medium">Until:</span> {new Date(bill.recurringEndDate).toLocaleDateString()}
+                      </div>
+                    )}
+                  </div>
+                )}
                 <div className="flex justify-between items-center mb-1">
                   <span className="font-medium">Payment Instructions:</span>
                   {onDeleteBill && (
@@ -112,6 +131,11 @@ const DayCell: React.FC<DayCellProps> = ({
                   )}
                 </div>
                 <div className="text-xs">{bill.paymentMethod || 'Not specified'}</div>
+                {bill.isVirtualRecurringInstance && (
+                  <div className="mt-2 text-xs italic text-gray-500">
+                    This is an automatically generated instance of a recurring bill.
+                  </div>
+                )}
               </div>
             )}
           </div>

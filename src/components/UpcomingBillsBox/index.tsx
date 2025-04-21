@@ -1,6 +1,7 @@
 import React, { useMemo } from 'react';
 import { Bill } from '@/types';
 import { getDueInDays } from '@/utils/dateHelpers';
+import { formatRecurringFrequency } from '@/utils/recurringBillsHelper';
 
 interface UpcomingBillsBoxProps {
   bills: Bill[];
@@ -78,8 +79,16 @@ const UpcomingBillsBox: React.FC<UpcomingBillsBoxProps> = ({ bills, onDeleteBill
             >
               <div className="flex-grow mr-4">
                 <div className="flex justify-between items-center">
-                  <span className="font-medium text-lg">{bill.name}</span>
-                  <span className="font-semibold text-blue-600">
+                  <span className="font-medium text-lg flex items-center">
+                    {bill.name}
+                    {bill.isRecurring && (
+                      <span 
+                        className="ml-2 inline-block w-3 h-3 rounded-full bg-green-500"
+                        title={`Recurring ${formatRecurringFrequency(bill.recurringFrequency)}`}
+                      ></span>
+                    )}
+                  </span>
+                  <span className={`font-semibold ${bill.isRecurring ? 'text-green-600' : 'text-blue-600'}`}>
                     ${bill.amount.toLocaleString('en-US', { maximumFractionDigits: 0 })}
                   </span>
                 </div>
@@ -92,7 +101,22 @@ const UpcomingBillsBox: React.FC<UpcomingBillsBoxProps> = ({ bills, onDeleteBill
                 </div>
                 
                 <div className="text-xs text-gray-600 mt-2 border-t border-gray-100 pt-2">
+                  {bill.isRecurring && (
+                    <div className="mb-1">
+                      <span className="font-medium">Recurring:</span> {formatRecurringFrequency(bill.recurringFrequency)}
+                      {bill.recurringEndDate && (
+                        <span className="ml-2">
+                          <span className="font-medium">Until:</span> {new Date(bill.recurringEndDate).toLocaleDateString()}
+                        </span>
+                      )}
+                    </div>
+                  )}
                   <span className="font-medium">Payment Instructions:</span> {bill.paymentMethod || 'Not specified'}
+                  {bill.isVirtualRecurringInstance && (
+                    <div className="mt-1 italic text-gray-500">
+                      This is an automatically generated instance of a recurring bill.
+                    </div>
+                  )}
                 </div>
               </div>
               
