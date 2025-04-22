@@ -15,6 +15,7 @@ const BillForm: React.FC<BillFormProps> = ({ onAddBill }) => {
   const [isRecurring, setIsRecurring] = useState(false);
   const [recurringFrequency, setRecurringFrequency] = useState<RecurringFrequency>('monthly');
   const [recurringEndDate, setRecurringEndDate] = useState('');
+  const [isAutoPaid, setIsAutoPaid] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const formRef = useRef<HTMLFormElement>(null);
 
@@ -133,6 +134,7 @@ const BillForm: React.FC<BillFormProps> = ({ onAddBill }) => {
         dueDate: isoDate,
         paymentMethod: paymentMethod,
         isRecurring: isRecurring,
+        isAutoPaid: isAutoPaid,
         ...(isRecurring && { recurringFrequency }),
         ...(isoEndDate && { recurringEndDate: isoEndDate }),
       };
@@ -147,6 +149,7 @@ const BillForm: React.FC<BillFormProps> = ({ onAddBill }) => {
       setIsRecurring(false);
       setRecurringFrequency('monthly');
       setRecurringEndDate('');
+      setIsAutoPaid(false);
       setErrors({});
     }
   };
@@ -264,6 +267,22 @@ const BillForm: React.FC<BillFormProps> = ({ onAddBill }) => {
           />
 
           {errors.paymentMethod && <p id="payment-error" className="mt-1 text-sm text-red-500">{errors.paymentMethod}</p>}
+        </div>
+        
+        {/* Auto-Paid Option */}
+        <div className="mb-4">
+          <div className="flex items-center mb-2">
+            <input
+              type="checkbox"
+              id="isAutoPaid"
+              checked={isAutoPaid}
+              onChange={(e) => setIsAutoPaid(e.target.checked)}
+              className="h-4 w-4 text-green-600 border-gray-300 rounded focus:ring-green-500"
+            />
+            <label htmlFor="isAutoPaid" className="ml-2 block text-sm font-medium text-gray-700">
+              This bill is automatically paid
+            </label>
+          </div>
         </div>
         
         {/* Recurring Bill Options */}

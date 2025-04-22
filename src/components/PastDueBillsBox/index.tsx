@@ -16,6 +16,11 @@ const PastDueBillsBox: React.FC<PastDueBillsBoxProps> = ({ bills, onDeleteBill }
         const today = new Date();
         today.setHours(0, 0, 0, 0);
         
+        // Filter out auto-paid bills from past due
+        if (bill.isAutoPaid) {
+          return false;
+        }
+        
         return dueDate < today;
       })
       .sort((a, b) => new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime());
@@ -52,12 +57,20 @@ const PastDueBillsBox: React.FC<PastDueBillsBoxProps> = ({ bills, onDeleteBill }
                   <div className="flex justify-between items-center">
                     <span className="font-medium text-lg flex items-center">
                       {bill.name}
-                      {bill.isRecurring && (
-                        <span 
-                          className="ml-2 inline-block w-3 h-3 rounded-full bg-green-500"
-                          title={`Recurring ${formatRecurringFrequency(bill.recurringFrequency)}`}
-                        ></span>
-                      )}
+                      <div className="flex ml-2">
+                        {bill.isRecurring && (
+                          <span 
+                            className="inline-block w-3 h-3 rounded-full bg-green-500 mr-1"
+                            title={`Recurring ${formatRecurringFrequency(bill.recurringFrequency)}`}
+                          ></span>
+                        )}
+                        {bill.isAutoPaid && (
+                          <span 
+                            className="inline-block w-3 h-3 rounded-full bg-purple-500"
+                            title="Automatically Paid"
+                          ></span>
+                        )}
+                      </div>
                     </span>
                     <span className={`font-semibold ${bill.isRecurring ? 'text-green-600' : 'text-red-600'}`}>
                       ${bill.amount.toLocaleString('en-US', { maximumFractionDigits: 0 })}
@@ -80,6 +93,11 @@ const PastDueBillsBox: React.FC<PastDueBillsBoxProps> = ({ bills, onDeleteBill }
                             <span className="font-medium">Until:</span> {new Date(bill.recurringEndDate).toLocaleDateString()}
                           </span>
                         )}
+                      </div>
+                    )}
+                    {bill.isAutoPaid && (
+                      <div className="mb-1">
+                        <span className="font-medium text-purple-600">Automatically Paid</span>
                       </div>
                     )}
                     <span className="font-medium">Payment Instructions:</span> {bill.paymentMethod || 'Not specified'}

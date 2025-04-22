@@ -68,6 +68,25 @@ export const importBills = (file: File): Promise<void> => {
           if (!bill.id || !bill.name || typeof bill.amount !== 'number' || !bill.dueDate) {
             throw new Error('Invalid bill data: Missing required fields');
           }
+          
+          // Ensure recurring properties are properly set
+          if (bill.isRecurring === true) {
+            // If isRecurring is true but no frequency is set, default to monthly
+            if (!bill.recurringFrequency) {
+              bill.recurringFrequency = 'monthly';
+            }
+            
+            // Validate that recurringFrequency is a valid value
+            const validFrequencies = ['weekly', 'biweekly', 'monthly', 'quarterly', 'annually'];
+            if (!validFrequencies.includes(bill.recurringFrequency)) {
+              bill.recurringFrequency = 'monthly'; // Default to monthly if invalid
+            }
+          }
+          
+          // Ensure isAutoPaid is a boolean
+          if (bill.isAutoPaid !== undefined && typeof bill.isAutoPaid !== 'boolean') {
+            bill.isAutoPaid = Boolean(bill.isAutoPaid);
+          }
         });
         
         // Save the bills to localStorage

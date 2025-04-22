@@ -8,6 +8,7 @@ export interface Bill {
   recurringFrequency?: 'weekly' | 'biweekly' | 'monthly' | 'quarterly' | 'annually'; // How often the bill recurs
   recurringEndDate?: string; // Optional end date for recurring bills (ISO format)
   isVirtualRecurringInstance?: boolean; // Flag for generated instances of recurring bills
+  isAutoPaid?: boolean; // Whether this bill is automatically paid
 }
 
 export type RecurringFrequency = 'weekly' | 'biweekly' | 'monthly' | 'quarterly' | 'annually';

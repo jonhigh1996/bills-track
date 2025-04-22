@@ -5,6 +5,7 @@ import Calendar from '@/components/Calendar';
 import UpcomingBillsBox from '@/components/UpcomingBillsBox';
 import PastDueBillsBox from '@/components/PastDueBillsBox';
 import ExportImport from '@/components/ExportImport';
+import MonthlyExpenses from '@/components/MonthlyExpenses';
 import { Bill } from '@/types';
 import { getBills, addBill, deleteBill } from '@/utils/storageService';
 import { generateRecurringBillInstances } from '@/utils/recurringBillsHelper';
@@ -126,6 +127,7 @@ export default function Home() {
       </div>
 
       <div className="container mx-auto px-4 py-4 sm:py-8 max-w-7xl">
+        <MonthlyExpenses bills={processedBills} currentMonth={currentMonth} />
         <ExportImport onImportComplete={loadBills} />
       </div>
 
