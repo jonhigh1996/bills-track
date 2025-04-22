@@ -163,11 +163,7 @@ const UpcomingBillsBox: React.FC<UpcomingBillsBoxProps> = ({ bills, onDeleteBill
                       </div>
                     )}
                     <span className="font-medium">Payment Instructions:</span> {bill.paymentMethod || 'Not specified'}
-                    {bill.isVirtualRecurringInstance && (
-                      <div className="mt-1 italic text-gray-500">
-                        This is an automatically generated instance of a recurring bill.
-                      </div>
-                    )}
+
                   </div>
                 </div>
                 

@@ -142,11 +142,6 @@ const DayCell: React.FC<DayCellProps> = ({
                   )}
                 </div>
                 <div className="text-xs">{bill.paymentMethod || 'Not specified'}</div>
-                {bill.isVirtualRecurringInstance && (
-                  <div className="mt-2 text-xs italic text-gray-500">
-                    This is an automatically generated instance of a recurring bill.
-                  </div>
-                )}
               </div>
             )}
           </div>
