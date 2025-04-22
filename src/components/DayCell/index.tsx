@@ -70,17 +70,25 @@ const DayCell: React.FC<DayCellProps> = ({
         {dayBills.map(bill => (
           <div 
             key={bill.id} 
-            className={`text-xs mb-1 sm:mb-2 p-1 sm:p-2 rounded-md ${bill.isRecurring ? 'bg-green-50 border-l-4 border-green-500' : 'bg-blue-50 border-l-4 border-blue-500'} shadow-sm`}
+            className={`text-xs mb-1 sm:mb-2 p-1 sm:p-2 rounded-md ${bill.isRecurring ? 'bg-green-50 border-l-4 border-green-500' : 'bg-blue-50 border-l-4 border-blue-500'} ${bill.isAutoPaid ? 'border-r-4 border-r-purple-500' : ''} shadow-sm`}
           >
             <div className="flex justify-between items-center cursor-pointer" onClick={() => toggleBillDetails(bill.id)}>
               <div className="text-sm font-medium truncate flex items-center">
                 {bill.name}
-                {bill.isRecurring && (
-                  <span 
-                    className="ml-1 inline-block w-2 h-2 rounded-full bg-green-500"
-                    title={`Recurring ${formatRecurringFrequency(bill.recurringFrequency)}`}
-                  ></span>
-                )}
+                <div className="flex ml-1">
+                  {bill.isRecurring && (
+                    <span 
+                      className="inline-block w-2 h-2 rounded-full bg-green-500 mr-1"
+                      title={`Recurring ${formatRecurringFrequency(bill.recurringFrequency)}`}
+                    ></span>
+                  )}
+                  {bill.isAutoPaid && (
+                    <span 
+                      className="inline-block w-2 h-2 rounded-full bg-purple-500"
+                      title="Automatically Paid"
+                    ></span>
+                  )}
+                </div>
               </div>
               <button 
                 className="text-gray-500 hover:text-gray-700 focus:outline-none flex items-center justify-center bg-white rounded-full p-1 border border-gray-200 shadow-sm"
@@ -112,6 +120,11 @@ const DayCell: React.FC<DayCellProps> = ({
                     )}
                   </div>
                 )}
+                {bill.isAutoPaid && (
+                  <div className="mb-2">
+                    <span className="font-medium text-purple-600">Automatically Paid</span>
+                  </div>
+                )}
                 <div className="flex justify-between items-center mb-1">
                   <span className="font-medium">Payment Instructions:</span>
                   {onDeleteBill && (
@@ -120,13 +133,11 @@ const DayCell: React.FC<DayCellProps> = ({
                         e.stopPropagation();
                         onDeleteBill(bill.id);
                       }}
-                      className="p-1 text-gray-400 hover:text-red-500 transition duration-200 rounded-full hover:bg-red-50"
+                      className="ml-1 bg-gray-100 text-gray-600 hover:text-red-500 hover:bg-red-50 transition duration-200 font-bold rounded px-1.5 py-0.5 flex items-center justify-center"
                       aria-label="Delete bill"
                       title="Delete bill"
                     >
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3" viewBox="0 0 20 20" fill="currentColor">
-                        <path fillRule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clipRule="evenodd" />
-                      </svg>
+                      ×
                     </button>
                   )}
                 </div>
