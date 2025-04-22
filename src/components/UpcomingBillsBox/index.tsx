@@ -109,15 +109,6 @@ const UpcomingBillsBox: React.FC<UpcomingBillsBoxProps> = ({ bills, onDeleteBill
         ) : (
           upcomingBills.map(bill => {
             const daysUntilDue = getDueInDays(bill.dueDate);
-            let statusColor = 'bg-green-100 text-green-800';
-            
-            if (daysUntilDue === 0) {
-              statusColor = 'bg-red-100 text-red-800';
-            } else if (daysUntilDue <= 2) {
-              statusColor = 'bg-orange-100 text-orange-800';
-            } else if (daysUntilDue <= 4) {
-              statusColor = 'bg-yellow-100 text-yellow-800';
-            }
             
             return (
               <div 
